@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import skimage.io as skio
-import cv2
 from glob import glob
 import click
 import os
@@ -9,6 +8,9 @@ from skimage import registration
 import scipy.ndimage as ndi
 from skimage.exposure import equalize_adapthist
 import re
+import cv2
+from reliability.Other_functions import crosshairs
+
 @click.group()
 def cli():
     pass
@@ -25,6 +27,10 @@ refPt = []
 @click.option('--window_size',default=100,type=int)
 @click.option('--img_scale',default=10.0,type=float)
 def makeBarcodeWithBead(img647_dir:str,img750_dir:str,bead_dir:str,n_ref:int,pattern:str,circle_size:int,thresh:float,window_size:int,img_scale:float):
+
+    
+
+
     global refPt
     if pattern is None:
         pattern = "*.TIFF"
@@ -66,19 +72,26 @@ def makeBarcodeWithBead(img647_dir:str,img750_dir:str,bead_dir:str,n_ref:int,pat
 
     ref_img = imgs[n_ref]
     ref_img = ref_img*img_scale
-    cv2.namedWindow('Image')
-    cv2.setMouseCallback('Image',recordClickLoc)
+
+    fig,ax = plt.subplots(num=1)
+    cid = fig.canvas.mpl_connect('button_release_event', recordClickLoc_mpl)
+    ax.imshow(ref_img,cmap='gray')
+    crosshairs()
+    plt.show()
     while True:
-	# display the image and wait for a keypress
-        cv2.imshow('Image',ref_img)
-        key = cv2.waitKey(1)
-        if key==ord('c'):
-            if len(refPt)<2:
-                continue
-            else:
-                print('Accepted')
-                print(refPt)
-                break
+  
+        if len(refPt)<2:
+            if not plt.fignum_exists(num=1):
+                fig,ax = plt.subplots(num=1)
+                cid = fig.canvas.mpl_connect('button_release_event', recordClickLoc_mpl)
+                ax.imshow(ref_img,cmap='gray')
+                crosshairs()
+                plt.show()
+            continue
+        else:
+            print('Accepted')
+            print(refPt)
+            break
     
     #load and register all the images based on the bead registration
 
@@ -113,10 +126,9 @@ def makeBarcodeWithBead(img647_dir:str,img750_dir:str,bead_dir:str,n_ref:int,pat
 
     
 
-def recordClickLoc(event, x, y, flags, param):
+def recordClickLoc_mpl(event):
     global refPt
-    if event==cv2.EVENT_LBUTTONUP:
-        refPt=[x,y]
+    refPt=[int(event.xdata),int(event.ydata)]
 
 def centreCrop(img,centrePt,window_size):
     h=window_size//2
@@ -158,4 +170,4 @@ if __name__=='__main__':
 
     # beads_dir = '/Volumes/shahidsWORK/561nm, Raw'
 
-    # makeBarcodeWithBead(img647_dir,img750_dir,beads_dir,n_ref=0,pattern="merFISH_*_002_01.TIFF",circle_size=4,thresh=0.99,window_size=50,img_scale=1)
+    # makeBarcodeWithBead(img647_dir,img750_dir,beads_dir,n_ref=0,pattern="merFISH_*_002_01.TIFF",circle_size=9,thresh=0.995,window_size=50,img_scale=1)
