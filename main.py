@@ -14,16 +14,16 @@ def cli():
     pass
 
 refPt = []
-# @cli.command('makeBarcodeWithBead')
-# @click.argument('img647_dir',type=click.Path(exists=True))
-# @click.argument('img750_dir',type=click.Path(exists=True))
-# @click.argument('bead_dir',type=click.Path(exists=True))
-# @click.option('--n_ref',default=0,type=int)
-# @click.option('--pattern',default=None,type=str)
-# @click.option('--circle_size',default=15,type=int)
-# @click.option('--thresh',default=0.99,type=float)
-# @click.option('--window_size',default=100,type=int)
-# @click.option('--img_scale',default=10.0,type=float)
+@cli.command('makeBarcodeWithBead')
+@click.argument('img647_dir',type=click.Path(exists=True))
+@click.argument('img750_dir',type=click.Path(exists=True))
+@click.argument('bead_dir',type=click.Path(exists=True))
+@click.option('--n_ref',default=0,type=int)
+@click.option('--pattern',default=None,type=str)
+@click.option('--circle_size',default=15,type=int)
+@click.option('--thresh',default=0.99,type=float)
+@click.option('--window_size',default=100,type=int)
+@click.option('--img_scale',default=10.0,type=float)
 def makeBarcodeWithBead(img647_dir:str,img750_dir:str,bead_dir:str,n_ref:int,pattern:str,circle_size:int,thresh:float,window_size:int,img_scale:float):
     global refPt
     if pattern is None:
@@ -150,12 +150,12 @@ def calcSpotThresh(img:np.ndarray,thresh_percent:float = 0.9)->float:
     #find the threshpercentile. i.e. sort the list, and then find the thresh_percent*len(list)
 
 if __name__=='__main__':
-    # cli()
+    cli()
 
-    img647_dir = '/Volumes/shahidsWORK/647nm, Raw'
+    # img647_dir = '/Volumes/shahidsWORK/647nm, Raw'
 
-    img750_dir = '/Volumes/shahidsWORK/750nm, Raw'
+    # img750_dir = '/Volumes/shahidsWORK/750nm, Raw'
 
-    beads_dir = '/Volumes/shahidsWORK/561nm, Raw'
+    # beads_dir = '/Volumes/shahidsWORK/561nm, Raw'
 
-    makeBarcodeWithBead(img647_dir,img750_dir,beads_dir,n_ref=0,pattern="merFISH_*_002_01.TIFF",circle_size=4,thresh=0.99,window_size=50,img_scale=1)
+    # makeBarcodeWithBead(img647_dir,img750_dir,beads_dir,n_ref=0,pattern="merFISH_*_002_01.TIFF",circle_size=4,thresh=0.99,window_size=50,img_scale=1)
