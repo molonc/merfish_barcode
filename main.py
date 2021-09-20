@@ -48,46 +48,56 @@ def makeBarcodeWithBead(img647_dir:str,img750_dir:str,bead_dir:str,n_ref:int,pat
     file_list_750.sort(key=lambda f: int(re.sub('\D', '', f)))
     
     bead_dir_pattern = os.path.join(bead_dir,pattern)
-    bead_file_list = glob(bead_dir_pattern)
-    bead_file_list.sort(key=lambda f: int(re.sub('\D', '', f)))
+    _bead_file_list = glob(bead_dir_pattern)
+    _bead_file_list.sort(key=lambda f: int(re.sub('\D', '', f)))
+
+    #load images
+    imgs = dict()
+    
+    if data_org is not None:
+        file_list=list()
+        bead_file_list = list()
+        df = pd.read_excel(data_org)
+        frame_num = df['frame']
+        
+        q_647 = deque(file_list_647)
+        q_750 = deque(file_list_750)
+        for r_idx,row in enumerate(frame_num.iteritems()):
+            
+            if row[1] == 2:
+                if q_750:
+                    file_list.append(q_750.popleft())
+                    bead_file_list.append(_bead_file_list[r_idx//2])
+                    
+            elif row[1] ==1:
+                if q_647:
+                    file_list.append(q_647.popleft())
+                    bead_file_list.append(_bead_file_list[r_idx//2])
+
+            
+            
+    else:
+        file_list = file_list_647+file_list_750
+        bead_file_list = _bead_file_list
+    
 
     #Register the beads
     bead_imgs = dict()
     for idx,fn in enumerate(bead_file_list):
         img = skio.imread(fn)
         bead_imgs[idx]=img
-    #load images
-    imgs = dict()
-    
-    if data_org is not None:
-        file_list=list()
-        df = pd.read_excel(data_org)
-        frame_num = df['frame']
-        
-        q_647 = deque(file_list_647)
-        q_750 = deque(file_list_750)
-        for row in frame_num.iteritems():
-            
-            if row[1] == 2:
-                if q_750:
-                    file_list.append(q_750.popleft())
-            elif row[1] ==1:
-                if q_647:
-                    file_list.append(q_647.popleft())
-            
-    else:
-        file_list = file_list_647+file_list_750
-    
-    
+
+    assert(len(bead_file_list)==len(file_list))
+
     for idx,fn in enumerate(file_list):
         
         _img = skio.imread(fn)
         
-        imgs[idx]=_img#equalize_adapthist(_img, clip_limit=0.03)
+        imgs[idx]=equalize_adapthist(_img, clip_limit=0.03)
 
     
     for idx in range(1,len(bead_imgs)):
-        shift,_,_ = registration.phase_cross_correlation(bead_imgs[n_ref]/2**9,bead_imgs[idx]/2**9,upsample_factor=10)
+        shift,_,_ = registration.phase_cross_correlation(bead_imgs[n_ref],bead_imgs[idx],upsample_factor=10)
         
         imgs[idx] = ndi.shift(imgs[idx],shift)
 
@@ -196,4 +206,4 @@ if __name__=='__main__':
     beads_dir = '/Volumes/shahidsWORK/561nm, Raw'
     data_org = '/Volumes/shahidsWORK/data_organization.xlsx'
 
-    makeBarcodeWithBead(img647_dir,img750_dir,beads_dir,n_ref=0,pattern="merFISH_*_003_01.TIFF",circle_size=9,thresh=0.99,window_size=50,img_scale=1,data_org=data_org)
+    makeBarcodeWithBead(img647_dir,img750_dir,beads_dir,n_ref=0,pattern="merFISH_*_003_01.TIFF",circle_size=6,thresh=0.99,window_size=50,img_scale=1,data_org=data_org)
