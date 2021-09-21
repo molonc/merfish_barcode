@@ -17,15 +17,15 @@ def cli():
 
 refPt = []
 @cli.command('makeBarcodeWithBead')
-@click.argument('img647_dir',type=click.Path(exists=True))
-@click.argument('img750_dir',type=click.Path(exists=True))
-@click.argument('bead_dir',type=click.Path(exists=True))
-@click.option('--n_ref',default=0,type=int)
-@click.option('--pattern',default=None,type=str)
-@click.option('--circle_size',default=15,type=int)
-@click.option('--thresh',default=0.995,type=float)
-@click.option('--window_size',default=100,type=int)
-@click.option('--img_scale',default=10.0,type=float)
+@click.argument('img647_dir',type=click.Path(exists=True),help='Location of the 647 nm images')
+@click.argument('img750_dir',type=click.Path(exists=True),help='Location of the 750 nm images')
+@click.argument('bead_dir',type=click.Path(exists=True),help='Location of the bead images')
+@click.option('--n_ref',default=0,type=int,help='The index of the file that will be used as datum for image registration')
+@click.option('--pattern',default=None,type=str,help='The glob pattern to be used for file extraction')
+@click.option('--circle_size',default=15,type=int,help='The approximate diameter of a probe')
+@click.option('--thresh',default=0.995,type=float,help='Local percentile for intensity extraction')
+@click.option('--window_size',default=100,type=int,help='Size of the window used for local percentile extraction')
+@click.option('--img_scale',default=10.0,type=float,help='Multiplier for image values to make it viewable')
 def makeBarcodeWithBead(img647_dir:str,img750_dir:str,bead_dir:str,n_ref:int,pattern:str,circle_size:int,thresh:float,window_size:int,img_scale:float):
 
     
