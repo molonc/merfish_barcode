@@ -1,0 +1,13 @@
+name: barcode_env
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - opencv
+  - scikit-image
+  - python=3.7
+  - matplotlib
+  - numpy
+  - click
+  - pip:
+    - reliability
